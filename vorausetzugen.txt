@@ -1,0 +1,6 @@
+pip install osmium pgeocode geopy
+
+lade eine PBF Datei herunter welche den relevanten Bereich enhält.
+Wenn die Datei zu groß wird, dauert es irgendwann sehr lange. ich arbeite aktuell mit rund 210MB. Das funktionirt noch recht schnell (ca. 1 Minuten) 
+Ich habe die Karte hier expotert: https://extract.bbbike.org/  
+fähige Leute würde es wahrscheinlich selbst mittels Python aus der Europakarte exportieren
