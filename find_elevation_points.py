@@ -111,7 +111,7 @@ def run_query(peaks, vf_segments):
         return vf_segments
     cross_only = prompt("Nur Gipfel mit Kreuz? (y/n): ").strip().lower().startswith('y')
     dominance = prompt("Dominanz berücksichtigen? (y/n): ").strip().lower().startswith('y')
-    via_only = prompt("Nur via_ferrata erreichbar? (y/n): ").strip().lower().startswith('y')
+    via_only = prompt("Klettersteig in der Nähe / am Weg? (y/n): ").strip().lower().startswith('y')
 
     # 2. Fragen für via_ferrata-Filter
     threshold_m = None
@@ -119,14 +119,14 @@ def run_query(peaks, vf_segments):
     if via_only:
         try:
             threshold_m = float(
-                prompt("Maximale Entfernung zum Klettersteig in Metern (z.B. 333): ").strip()
+                prompt("Maximale Entfernung Gipfel <-> Klettersteig in Metern (z.B. 333): ").strip()
             )
         except ValueError:
             print("Ungültige Entfernung. via_ferrata-Filter deaktiviert.")
             via_only = False
         if via_only:
             try:
-                max_scale = int(prompt("Maximale Schwierigkeit (0–6): ").strip())
+                max_scale = int(prompt("Maximale Schwierigkeit (0–6) des Klettersteigs laut OSM System: ").strip())
             except ValueError:
                 print("Ungültige Skala. via_ferrata-Filter deaktiviert.")
                 via_only = False
@@ -150,7 +150,7 @@ def run_query(peaks, vf_segments):
         p for p in peaks
         if p['ele'] >= min_ele and (not cross_only or p['summit_cross'])
     ]
-    print(f"Nach Höhe/Kreuz: {len(candidates)} Kandidaten")
+    print(f"nur nach Höhe/Kreuz gefiltert gibt: {len(candidates)} Gipfel")
 
     # 6. via_ferrata-Filter
     if via_only:
