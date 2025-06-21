@@ -151,7 +151,7 @@ def run_query(peaks, vf_segments):
         if p['ele'] >= min_ele and (not cross_only or p['summit_cross'])
     ]
     print(f"nur nach Höhe/Kreuz gefiltert gibt: {len(candidates)} Gipfel")
-
+    print(f"suche nach Gipfel mit Klettersteig kann etwas dauern")
     # 6. via_ferrata-Filter
     if via_only:
         before = len(candidates)
@@ -159,7 +159,7 @@ def run_query(peaks, vf_segments):
             p for p in candidates
             if is_reachable_via(p, vf_segments, max_scale, threshold_m)
         ]
-        print(f"Nach via_ferrata-Filter: {len(candidates)} (vorher {before})")
+        print(f"mit Filter nach Klettersteig in der Nähe: {len(candidates)} (vorher {before})")
 
     if not candidates:
         print("Keine passenden Peaks gefunden.")
