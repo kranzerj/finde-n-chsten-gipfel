@@ -4,7 +4,7 @@ https://www.python.org/downloads/
 pip install osmium pgeocode geopy
 
 lade eine PBF Datei herunter welche den relevanten Bereich enthält.
-Wenn die Datei zu groß wird, dauert es irgendwann sehr lange. ich arbeite aktuell mit rund 210MB. Das funktioniert noch recht schnell (ca. 1 Minuten).
+Wenn die Datei zu groß wird, dauert es irgendwann sehr lange. ich arbeite meist mit rund 210MB. Das funktioniert noch recht schnell (ca. 1 Minuten import ohne Klettersteige).
 Mit 460MB ist auch noch OK aber dauert schon deutlich länger (Import ohne Klettersteige dauert schon ca. 2min 20 Sekunden mit  Ryzen 7 5700G)
 Ich habe die Karte hier exportiert: https://extract.bbbike.org/  
 fähige Leute würde es wahrscheinlich selbst mittels Python aus der Europakarte exportieren
