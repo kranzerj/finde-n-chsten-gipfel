@@ -7,8 +7,8 @@ und ermöglicht mehrfaches Abfragen mit geänderten Parametern
 (Mindesthöhe, Kreuzfilter, Dominanz und Erreichbarkeit per Klettersteig).
 
 Dominanz: Luftlinienentfernung zum nächsthöheren Peak (in km).
-Klettersteig-Erreichbarkeit: Ein via_ferrata-Segment innerhalb eines abzufragenden Umkreises
-in Metern (nur wenn via_ferrata-Filter aktiv) zählt als erreichbar.
+Klettersteig-Erreichbarkeit: Ein via_ferrata-Segment innerhalb eines abgefragten Umkreises
+in Metern zählt als erreichbar (nur wenn der via_ferrata-Filter aktiv ist).
 
 Abhängigkeiten:
     pip install osmium pgeocode geopy
@@ -66,7 +66,7 @@ class ViaFerrataLoader(osmium.SimpleHandler):
 def load_peaks(map_file):
     print(f"Lade OSM-Datei '{map_file}' und sammle alle Peaks...")
     loader = PeakLoader()
-    loader.apply_file(map_file)
+    loader.apply_file(map_file, locations=True)
     print(f"Insgesamt {len(loader.peaks)} Peaks geladen.")
     return loader.peaks
 
@@ -99,7 +99,6 @@ def is_reachable_via(peak, vf_segments, max_scale, threshold_m):
 
 
 def run_query(peaks, vf_segments):
-    # Allgemeine Parameter
     country = prompt("Startland (z.B.: AT): ").strip().upper()
     postal_code = prompt("Start PLZ (z.B.: 4363): ").strip()
     try:
@@ -111,27 +110,25 @@ def run_query(peaks, vf_segments):
     dominance = prompt("Dominanz berücksichtigen? (y/n): ").strip().lower().startswith('y')
     via_only = prompt("Nur via_ferrata erreichbar? (y/n): ").strip().lower().startswith('y')
 
-    # Fragen für via_ferrata-Filter
     threshold_m = None
     max_scale = None
+    # Abfrage nur, wenn via_filter aktiv
     if via_only:
         try:
-            thr_input = prompt("Maximale Entfernung zum Klettersteig in Metern (z.B. 333): ").strip()
-            threshold_m = float(thr_input)
+            threshold_m = float(prompt("Maximale Entfernung zum Klettersteig in Metern (z.B. 333): ").strip())
         except ValueError:
-            print("Ungültige Entfer-nung, via_ferrata-Filter deaktiviert.")
+            print("Ungültige Entfernung. via_ferrata-Filter deaktiviert.")
             via_only = False
         if via_only:
             try:
                 max_scale = int(prompt("Maximale Schwierigkeit (0–6): ").strip())
             except ValueError:
-                print("Ungültige Skala, via_ferrata-Filter deaktiviert.")
+                print("Ungültige Skala. via_ferrata-Filter deaktiviert.")
                 via_only = False
-    # Nachladen bei Bedarf
+    # dynamisches Nachladen
     if via_only and not vf_segments:
         vf_segments = load_via_ferrata(map_file)
 
-    # Geokodierung
     print(f"Geokodiere PLZ {postal_code} in {country}...")
     nomi = pgeocode.Nominatim(country)
     res = nomi.query_postal_code(postal_code)
@@ -141,10 +138,10 @@ def run_query(peaks, vf_segments):
     start = (res.latitude, res.longitude)
     print(f"Startkoordinaten: {start[0]:.5f}, {start[1]:.5f}")
 
-    # 1. Filter nach Höhe und Kreuz
+    # Filter nach Höhe und Kreuz
     candidates = [p for p in peaks if p['ele'] >= min_ele and (not cross_only or p['summit_cross'])]
     print(f"Nach Höhe/Kreuz: {len(candidates)} Kandidaten")
-    # 2. via_ferrata-Filter
+    # via_ferrata-Filter per Luftlinie
     if via_only:
         before = len(candidates)
         candidates = [p for p in candidates if is_reachable_via(p, vf_segments, max_scale, threshold_m)]
@@ -153,11 +150,11 @@ def run_query(peaks, vf_segments):
         print("Keine passenden Peaks.")
         return vf_segments
 
-    # 3. Distanzen berechnen und sortieren
+    # Distanzen berechnen
     dist_list = [(geodesic(start, (p['lat'], p['lon'])).kilometers, p) for p in candidates]
     dist_list.sort(key=lambda x: x[0])
 
-    # 4. Ausgabe
+    # Ausgabe
     if dominance:
         nearest20 = dist_list[:20]
         dom_list = [(compute_dominance(peaks, p), dist, p) for dist, p in nearest20]
