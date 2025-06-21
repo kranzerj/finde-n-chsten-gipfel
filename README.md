@@ -9,5 +9,5 @@ Mit 460MB ist auch noch OK aber dauert schon deutlich länger (Import ohne Klett
 Ich habe die Karte hier exportiert: https://extract.bbbike.org/  
 fähige Leute würde es wahrscheinlich selbst mittels Python aus der Europakarte exportieren
 
-Die Klettersteig Sucht, sucht einfach, bei welchen Gipfel ein Klettersteig in der nähe ist. 
+Die Klettersteigsuche, sucht einfach, bei welchen Gipfel ein Klettersteig in der Nähe ist. 
 wenn die Distanz gering gesetzt wird, werden eher jene Gipfel angezeigt, wo der Klettersteig direkt hin führt. wenn der weit weiter gesetzt wird, könnten auch benachbarte Klettersteige angezeigt werden. 
