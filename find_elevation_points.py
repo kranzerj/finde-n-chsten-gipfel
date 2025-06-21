@@ -18,8 +18,8 @@ import pgeocode
 from geopy.distance import geodesic
 import sys
 
-# Konfigurierbare Schwellwerte
-THRESHOLD_DISTANCE = 1777  # Meter Luftlinien-Abstand zum nächsten via_ferrata-Knoten
+# Globale Variable für Klettersteig-Umkreis
+THRESHOLD_DISTANCE = 666  # Standard (Meter)
 
 
 def prompt(msg):
@@ -58,7 +58,7 @@ class ViaFerrataLoader(osmium.SimpleHandler):
             scale = int(w.tags.get('via_ferrata_scale', ''))
         except (ValueError, TypeError):
             scale = None
-        coords = [(nd.location.lat, nd.location.lon) for nd in w.nodes if nd.location.valid()]
+        coords = [(n.location.lat, n.location.lon) for n in w.nodes if n.location.valid()]
         if coords:
             self.segments.append({'coords': coords, 'scale': scale})
 
@@ -109,6 +109,7 @@ def run_query(peaks, vf_segments):
     cross_only = prompt("Nur Gipfel mit Kreuz? (y/n): ").strip().lower().startswith('y')
     dominance = prompt("Dominanz berücksichtigen? (y/n): ").strip().lower().startswith('y')
     via_only = prompt("Nur via_ferrata erreichbar? (y/n): ").strip().lower().startswith('y')
+    max_scale = None
     if via_only and not vf_segments:
         vf_segments = load_via_ferrata(map_file)
     if via_only:
@@ -117,7 +118,6 @@ def run_query(peaks, vf_segments):
         except ValueError:
             print("Ungültige Skala. Ignoriere via_ferrata-Filter.")
             via_only = False
-            max_scale = None
     print(f"Geokodiere PLZ {postal_code} in {country}...")
     nomi = pgeocode.Nominatim(country)
     res = nomi.query_postal_code(postal_code)
@@ -154,9 +154,16 @@ def run_query(peaks, vf_segments):
 
 
 def main():
-    global map_file
+    global map_file, THRESHOLD_DISTANCE
+    # Kartendatei abfragen, Beispiel: max.pbf
     map_file = prompt("Kartendatei (z.B.: max.pbf): ").strip()
     use_via = prompt("Klettersteige initial laden? (y/n): ").strip().lower().startswith('y')
+    # Threshold nur abfragen, wenn via_ferrata-Filter genutzt werden soll
+    if use_via:
+        try:
+            THRESHOLD_DISTANCE = float(prompt("Maximale Entfernung zum Klettersteig in Metern (z.B. 333): ").strip())
+        except ValueError:
+            print(f"Ungültige Zahl, verwende Standard {THRESHOLD_DISTANCE} m.")
     peaks = load_peaks(map_file)
     vf_segments = []
     if use_via:
