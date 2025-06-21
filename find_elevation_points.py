@@ -66,7 +66,7 @@ class ViaFerrataLoader(osmium.SimpleHandler):
 def load_peaks(map_file):
     print(f"Lade OSM-Datei '{map_file}' und sammle alle Peaks...")
     loader = PeakLoader()
-    loader.apply_file(map_file, locations=True)
+    loader.apply_file(map_file)
     print(f"Insgesamt {len(loader.peaks)} Peaks geladen.")
     return loader.peaks
 
